@@ -1,0 +1,98 @@
+from pprint import pprint
+import numpy as np
+
+comparison_matrix = np.array([
+    [1, 5, 1/6, 1/7, 5],
+    [1/5, 1, 1/8, 1/8, 3],
+    [6, 8, 1, 1, 9],
+    [7, 8, 1, 1, 9],
+    [1/5, 1/3, 1/9, 1/9, 1]
+])
+
+comparison_matrix1 = np.array([
+ [1, 7, 1/3, 1/2, 5],
+ [1/7, 1, 1/7, 1/6, 1/2],
+ [3, 7, 1, 1, 5],
+ [2, 6, 1, 1, 4],
+ [1/5, 2, 1/5, 1/4, 1]
+])
+
+comparison_matrix2 = np.array([
+[1, 3, 1/2, 1/4, 1/3],
+ [1/3, 1, 1/3, 1/6, 1/4],
+ [2, 3, 1, 1/2, 1/3],
+ [4, 6, 2, 1, 1/2],
+ [3, 4, 3, 2, 1]
+])
+
+comparison_matrix3 = np.array([
+ [1,   1/3, 1/2, 2/3, 1/3],
+ [3,   1,   2/3, 1/2, 1/2],
+ [2,   3/2, 1, 2/3, 2/3],
+ [3/2, 2,   3/2, 1, 2/3],
+ [3,   2, 3/2, 3/2, 1]
+])
+
+comparison_matrix4 = np.array([
+[1, 2, 1/2, 1/3, 3],
+ [1/2, 1, 1/3, 1/4, 1],
+ [2, 3, 1, 1/2, 2],
+ [3, 4, 2, 1, 3],
+ [1/3, 1, 1/2, 1/3, 1]
+])
+
+comparison_matrix5 = np.array([
+ [1, 1/2, 3/4, 7/8, 2],
+ [2, 1, 3/2, 7/6, 3],
+ [4/3, 2/3, 1, 7/8, 4/3],
+ [8/7, 6/7, 8/7, 1, 8/3],
+ [1/2, 1/3, 3/4, 3/8, 1]
+])
+
+def func(matrix):
+    geometric_means = np.prod(matrix, axis=1) ** (1/matrix.shape[1])
+
+    weights = geometric_means / sum(geometric_means)
+    
+    geometric_means_rounded = np.round(geometric_means, 3)
+    weights_rounded = np.round(weights, 3)
+    sum_rounded = np.round(sum(geometric_means), 3)
+    
+    print("Геометрические средние (округленные):", geometric_means_rounded)
+    print("Нормализованные веса (Wi, округленные):", weights_rounded)
+    print('Сумма Vi', sum_rounded)
+
+def calculate_ahp_metrics(matrix):
+    # Вычисление геометрических средних
+    geometric_means = np.prod(matrix, axis=1) ** (1 / matrix.shape[1])
+    
+    W = geometric_means / np.sum(geometric_means)
+    
+    S = np.sum(matrix, axis=0)
+    
+    P = S * W
+    lambda_max = np.sum(P) / np.sum(W)
+    
+    n = matrix.shape[0]
+    IC = (lambda_max - n) / (n - 1)
+    RI = {1: 0, 2: 0, 3: 0.58, 4: 0.9, 5: 1.12, 6: 1.24, 7: 1.32, 8: 1.41, 9: 1.45, 10: 1.49}
+    OC = IC / RI[n] if n in RI and RI[n] != 0 else None
+    W = np.round(W, 3)
+    S = np.round(S, 3)
+    P = np.round(P, 3)
+    lambda_max = round(lambda_max, 3)
+    IC = round(IC, 3)
+    OC = round(OC, 3) if OC is not None else None
+    
+    return {
+        'W': W,
+        'S': S,
+        'P': P,
+        'lambda_max': lambda_max,
+        'IC': IC,
+        'OC': OC
+    }
+func(comparison_matrix2)
+
+
+pprint(calculate_ahp_metrics(comparison_matrix2))
